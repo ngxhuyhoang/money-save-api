@@ -7,8 +7,6 @@ import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountEntity } from '@modules/account/entities/account.entity';
 import { ProfileEntity } from '@modules/profile/entities/profile.entity';
-import { RoleEntity } from '@modules/role/entities/role.entity';
-import { PermissionEntity } from '@modules/permission/entities/permission.entity';
 
 @Module({
   imports: [
@@ -23,7 +21,7 @@ import { PermissionEntity } from '@modules/permission/entities/permission.entity
         },
       }),
     }),
-    TypeOrmModule.forFeature([AccountEntity, ProfileEntity, RoleEntity, PermissionEntity]),
+    TypeOrmModule.forFeature([AccountEntity, ProfileEntity]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
