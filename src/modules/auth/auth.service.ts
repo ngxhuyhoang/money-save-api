@@ -8,7 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { RegisterRequestDto } from './dto/register-request.dto';
-import { LogoutRequestDto } from './dto/logout-request.dto';
 import { RefreshTokenRequestDto } from './dto/refresh-token-request.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -35,9 +34,7 @@ export class AuthService {
     try {
       const existedAccount = await this._accountRepository.findOne({
         where: { email: loginRequestDto.email },
-        relations: {
-          profile: true,
-        },
+        relations: ['profile'],
       });
       if (!existedAccount) {
         throw new NotFoundException('User is not registered');
@@ -53,6 +50,7 @@ export class AuthService {
       });
       const refreshToken = await this._jwtService.sign(
         {
+          accountId: existedAccount.id,
           userId: existedAccount.profile.id,
           email: existedAccount.email,
         },
@@ -113,10 +111,10 @@ export class AuthService {
     }
   }
 
-  async logout(accountId: number, logoutRequestDto: LogoutRequestDto) {
+  async logout(accountId: number) {
     try {
       const account = await this._accountRepository.findOne({
-        where: { id: accountId, refreshToken: logoutRequestDto.refreshToken },
+        where: { id: accountId },
       });
       await this._accountRepository.update(account.id, { refreshToken: '' });
       return 'Logout successfully';
@@ -192,4 +190,6 @@ export class AuthService {
       throw new BadRequestException(error.message);
     }
   }
+
+  async verifyAccount(email: string) {}
 }

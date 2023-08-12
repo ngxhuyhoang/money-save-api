@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '@guards/jwt-auth.guard';
@@ -6,7 +6,6 @@ import { LoginRequestDto } from './dto/login-request.dto';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { Public } from '@decorators/public.decorator';
 import { AuthUser, AuthUserDto } from '@decorators/auth-user.decorator';
-import { LogoutRequestDto } from './dto/logout-request.dto';
 import { ResponseMessage } from '@decorators/response.decorator';
 import { RefreshTokenRequestDto } from './dto/refresh-token-request.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -39,8 +38,8 @@ export class AuthController {
   @Post('logout')
   @ApiBearerAuth()
   @ApiOperation({ deprecated: false })
-  async logout(@AuthUser() user: AuthUserDto, @Body() logoutRequestDto: LogoutRequestDto) {
-    return await this.authService.logout(user.accountId, logoutRequestDto);
+  async logout(@AuthUser() user: AuthUserDto) {
+    return await this.authService.logout(user.accountId);
   }
 
   @Post('reset-password')
@@ -62,5 +61,11 @@ export class AuthController {
   @ApiOperation({ deprecated: false })
   async refreshToken(@Body() body: RefreshTokenRequestDto) {
     return await this.authService.refreshToken(body);
+  }
+
+  @Get('verify')
+  @Public()
+  async verifyAccount(@Query('email') email: string) {
+    return await this.authService.verifyAccount(email);
   }
 }

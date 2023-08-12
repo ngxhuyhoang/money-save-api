@@ -1,26 +1,74 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TransactionEntity } from './entities/transaction.entity';
+import { Repository } from 'typeorm';
+import { AuthUserDto } from '@decorators/auth-user.decorator';
 
 @Injectable()
 export class TransactionService {
-  create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
+  constructor(
+    @InjectRepository(TransactionEntity)
+    private readonly _transactionRepository: Repository<TransactionEntity>,
+  ) {}
+
+  async create(createTransactionDto: CreateTransactionDto, authUser: AuthUserDto) {
+    try {
+      const result = await this._transactionRepository.save({
+        ...createTransactionDto,
+        account: { id: authUser.accountId },
+        type: createTransactionDto.type,
+        categories: createTransactionDto.categories,
+      });
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  findAll() {
-    return `This action returns all transaction`;
+  async findAll(authUser: AuthUserDto) {
+    try {
+      const result = await this._transactionRepository.find({
+        where: {
+          account: { id: authUser.accountId },
+        },
+        relations: ['categories', 'account'],
+      });
+      return result.map((x) => ({ ...x, account: undefined }));
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  async findOne(id: number, authUser: AuthUserDto) {
+    try {
+      const result = await this._transactionRepository.findOne({
+        where: {
+          account: { id: authUser.accountId },
+        },
+        relations: ['categories', 'account'],
+      });
+      delete result.account;
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
+  async update(id: number, updateTransactionDto: UpdateTransactionDto) {
+    try {
+      await this._transactionRepository.update(id, updateTransactionDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+  async remove(id: number) {
+    try {
+      await this._transactionRepository.softDelete(id);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

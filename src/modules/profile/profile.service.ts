@@ -12,10 +12,6 @@ export class ProfileService {
     private readonly _profileRepository: Repository<ProfileEntity>,
   ) {}
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
-  }
-
   async update(id: number, updateProfileDto: UpdateProfileDto) {
     try {
       const existedProfile = await this._profileRepository.findOne({ where: { id } });
@@ -35,7 +31,6 @@ export class ProfileService {
       if (!existedProfile) {
         throw new NotFoundException('Profile is not found');
       }
-      console.log(existedProfile);
       return existedProfile;
     } catch (error) {
       throw new BadRequestException(error.message);
