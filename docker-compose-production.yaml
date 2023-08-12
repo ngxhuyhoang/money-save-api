@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # MySQL
+  database:
+    # image: mysql/mysql-server:8.0.31-aarch64
+    image: mysql:8
+    container_name: e-commerce-database
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_HOST=0.0.0.0
+      - MYSQL_USER=hoang
+      - MYSQL_PASSWORD=12345678
+      - MYSQL_ROOT_PASSWORD=12345678
+      - MYSQL_DATABASE=money_save_database
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    networks:
+      - app-network
+
+  # Redis
+  redis:
+    container_name: e-commerce-redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+    networks:
+      - app-network
+
+  # Server
+  app:
+    build: .
+    container_name: e-commerce-api
+    command: node dist/main.js
+    restart: unless-stopped
+    env_file: .env.production
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    depends_on:
+      - database
+      - redis
+    ports:
+      - 4200:4200
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
