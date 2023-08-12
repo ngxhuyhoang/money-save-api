@@ -7,6 +7,8 @@ import { AccountModule } from './modules/account/account.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from './modules/mailer/mailer.module';
+import { CategoryModule } from './modules/category/category.module';
+import { TransactionModule } from './modules/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { MailerModule } from './modules/mailer/mailer.module';
     AccountModule,
     ProfileModule,
     MailerModule,
+    CategoryModule,
+    TransactionModule,
   ],
 })
 export class AppModule {}

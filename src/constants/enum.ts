@@ -8,3 +8,8 @@ export enum MetadataKey {
   ROLES = 'roles',
   RESPONSE_MESSAGE = 'responseMessage',
 }
+
+export enum TransactionType {
+  INCOME = 'income',
+  EXPENSE = 'expense',
+}

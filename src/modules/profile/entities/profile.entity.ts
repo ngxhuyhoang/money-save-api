@@ -20,7 +20,7 @@ export class ProfileEntity extends BasedEntity {
   @Index()
   dateOfBirth: Date;
 
-  @OneToOne(() => AccountEntity, (account) => account.profile, { cascade: true })
+  @OneToOne(() => AccountEntity, (account) => account.profile)
   @JoinColumn()
   account: AccountEntity;
 }

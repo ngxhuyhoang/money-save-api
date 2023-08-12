@@ -90,23 +90,22 @@ export class AuthService {
         },
       );
 
+      const accountCreated = await this._accountRepository.save({
+        email: registerRequestDto.email,
+        password: hashPassword,
+        refreshToken: refreshToken,
+      });
       const profileCreated = await this._profileRepository.save({
         firstName: registerRequestDto.firstName,
         lastName: registerRequestDto.lastName,
         dateOfBirth: registerRequestDto.dateOfBirth,
-        account: this._accountRepository.create({
-          email: registerRequestDto.email,
-          password: hashPassword,
-          refreshToken: refreshToken,
-        }),
+        account: { id: accountCreated.id },
       });
 
       const accessToken: string = await this._jwtService.sign({
         email: registerRequestDto.email,
         accountId: profileCreated.id,
-        userId: profileCreated.account.id,
-        roles: [],
-        permissions: [],
+        userId: accountCreated.id,
       });
       return { accessToken, refreshToken: refreshToken };
     } catch (error) {

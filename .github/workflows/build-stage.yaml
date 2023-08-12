@@ -13,18 +13,16 @@ jobs:
       - name: Clean Docker
         run: docker system prune -a -f
       - name: Check lint
-        run: | 
-          cd /root/project/e-commerce-api
+        run: |
+          cd /root/project/money-save-api
           git fetch origin -p
           git merge origin/main 
           npx yarn install 
           npx yarn lint
       - name: Deploy
         run: |
-          cd /root/project/e-commerce-api 
+          cd /root/project/money-save-api 
           git fetch origin -p 
           git merge origin/main 
           npx yarn install 
           npx yarn docker:deploy
-
-
